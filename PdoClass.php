@@ -5,10 +5,10 @@
         <body>
             <form>
   <select>
-  <option value="volvo">Volvo</option>
-  <option value="saab">Saab</option>
-  <option value="mercedes">Mercedes</option>
-  <option value="audi">Audi</option>
+  <option value=""></option>
+  <option value=""></option>
+  <option value=""></option>
+  <option value=""></option>
   </select>
              </form>
            
@@ -16,6 +16,7 @@
 <?php
 class PDOClass {
     public $dbh;
+    public $query;
     function connect() 
     {
     $hostname = 'localhost';
@@ -51,9 +52,9 @@ catch(PDOException $e)
     {
         try
         {
+         echo "<br/>"."<h1>"."Select using PDO"."</h1>"."<br />";
         $sql = "SELECT * FROM animals";
-        echo "<br/>"."<h1>"."Select using PDO"."</h1>"."<br />";
-         foreach ($this->dbh->query($sql) as $row)
+        foreach ($this->dbh->query($sql) as $row)
             {
                 print $row['animal_type'] .' - '. $row['animal_name'] . '<br />';
             }
@@ -111,7 +112,7 @@ catch(PDOException $e)
         $sql = "SELECT * FROM animals";
         $stmt = $this->dbh->query($sql);//fetch to pdo
         $result = $stmt->fetch(PDO::FETCH_NUM);
-            echo "<br/>"."<h1>"."Function of fetch Num"."</h1>";
+         echo "<br/>"."<h1>"."Function of fetch Num"."</h1>";
 
         foreach($result as $key=>$val)
             {
@@ -230,7 +231,98 @@ catch(PDOException $e)
         
 }//end of FetchClass
 
+    function ErrorHandling()
+    {
+    try
+      {
+        $sql = "SELECT username FROM animals";
+        echo "<br/>"."<h1>"."Error Handling"."</h1>";
 
+        foreach ($this->dbh->query($sql) as $row)
+        {
+        print $row['animal_type'] .' - '. $row['animal_name'] . '<br />';
+        }
+
+    /*** close the database connection ***/
+    //$dbh = null;
+        }
+        catch(PDOException $e)
+            {
+            echo $e->getMessage();
+            }
+            
+    }//end of ErrorHandle
+        
+   
+
+    function PreparedStaement() 
+    {
+     try 
+        {
+         $animal_id = 80;
+         $animal_name = 'elephant';
+         $stmt = $this->dbh->prepare("SELECT * FROM animals WHERE animal_id = :animal_id AND animal_name = :animal_name");
+         $stmt->bindParam(':animal_id', $animal_id, PDO::PARAM_INT);
+         $stmt->bindParam(':animal_name', $animal_name, PDO::PARAM_STR, 5); 
+         $stmt->execute();
+
+            $result = $stmt->fetchAll();
+            //echo"$result";
+            echo "<br/>"."<h1>"."Prepared statement using PDO"."</h1>";
+     foreach($result as $row)
+        {
+        echo $row['animal_id'].'<br />';
+        echo $row['animal_type'].'<br />';
+        echo $row['animal_name'];
+        }
+
+    /*** close the database connection ***/
+    //$dbh = null;
+        }
+    catch(PDOException $e)
+    {
+    echo $e->getMessage();
+    }   
+ }//end of prepared statement
+
+    function Transction()
+ {
+        try
+        {
+   $this->dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+   $this->dbh->beginTransaction();
+    $table = "CREATE TABLE wildAnimals ( id INT(8) NOT NULL AUTO_INCREMENT PRIMARY KEY,type VARCHAR(25) NOT NULL,name VARCHAR(25) NOT NULL 
+    )";
+   $this->dbh->exec($table);
+    /***  INSERT statements ***/
+   $this->dbh->exec("INSERT INTO wildAnimals (type,name) VALUES ('human', 'harshal')");
+   $this->dbh->exec("INSERT INTO wildAnimals (type,name) VALUES ('funny', 'Tiger')");
+   $this->dbh->exec("INSERT INTO wildAnimals (type,name) VALUES ('lizard', 'Atif')");
+   $this->dbh->exec("INSERT INTO wildAnimals (type,name) VALUES ('dingo', 'Mainsh')");
+   $this->dbh->exec("INSERT INTO wildAnimals (type,name) VALUES ('kangaroo', 'Shiva')");
+   $this->dbh->exec("INSERT INTO wildAnimals (type,name) VALUES ('wallaby', 'Nitin')");
+   $this->dbh->exec("INSERT INTO wildAnimals (type,name) VALUES ('wombat', 'Amit')");
+   $this->dbh->exec("INSERT INTO wildAnimals (type,name) VALUES ('koala', 'Ashok')");
+   $this->dbh->exec("INSERT INTO wildAnimals (type,name) VALUES ('kiwi', 'Ravi')");
+   $this->dbh->exec("DROP table wildAnimals");
+
+    
+   $this->dbh->commit();
+
+   
+    echo 'Data entered successfully<br />';
+}
+catch(PDOException $e)
+    {
+   
+   $this->dbh->rollback();
+
+   
+    echo $sql . '<br />' . $e->getMessage();
+    }       
+ }
+ 
+ 
 }//end of PDOClass
 
 
@@ -259,6 +351,9 @@ $obj->FetchBoth();
 $obj->FetchObject();
 $obj->FetchLazy();
 $obj->FetchClass();
+$obj->ErrorHandling();
+$obj->PreparedStaement();
+$obj->Transction();
 
 ?>
  </body>
