@@ -14,7 +14,8 @@
            
 
 <?php
-class PDOClass {
+class PDOClass 
+{
     public $dbh;
     public $query;
     function connect() 
@@ -291,6 +292,8 @@ catch(PDOException $e)
         {
    $this->dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
    $this->dbh->beginTransaction();
+   $table1 = "drop table wildAnimals";
+   $this->dbh->exec($table1);
     $table = "CREATE TABLE wildAnimals ( id INT(8) NOT NULL AUTO_INCREMENT PRIMARY KEY,type VARCHAR(25) NOT NULL,name VARCHAR(25) NOT NULL 
     )";
    $this->dbh->exec($table);
@@ -304,7 +307,7 @@ catch(PDOException $e)
    $this->dbh->exec("INSERT INTO wildAnimals (type,name) VALUES ('wombat', 'Amit')");
    $this->dbh->exec("INSERT INTO wildAnimals (type,name) VALUES ('koala', 'Ashok')");
    $this->dbh->exec("INSERT INTO wildAnimals (type,name) VALUES ('kiwi', 'Ravi')");
-   $this->dbh->exec("DROP table wildAnimals");
+   //$this->dbh->exec("DROP table wildAnimals");
 
     
    $this->dbh->commit();
@@ -323,6 +326,31 @@ catch(PDOException $e)
  }
  
  
+ function lastInsertId() 
+ {
+
+     try 
+     {
+    
+    
+    $this->dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    echo "<br/>"."<h1>"."Last insert Element Id"."</h1>";
+    $this->dbh->exec("INSERT INTO animals(animal_type, animal_name) VALUES ('galah', 'polly')");
+    echo $this->dbh->lastInsertId();
+
+    /*** close the database connection ***/
+    $this->dbh = null;
+    }
+
+    catch(PDOException $e)
+    {
+    echo $e->getMessage();
+    }
+ }//lastInsertId
+ 
+ 
+ 
+ //$this->dbh=NULL;
 }//end of PDOClass
 
 
@@ -354,6 +382,7 @@ $obj->FetchClass();
 $obj->ErrorHandling();
 $obj->PreparedStaement();
 $obj->Transction();
+$obj->lastInsertId();
 
 ?>
  </body>
